@@ -2,6 +2,7 @@ package com.arashiq.rssreader.util;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.util.Log;
 import android.util.Xml;
 
 import com.arashiq.rssreader.model.RssFeed;
@@ -25,11 +26,10 @@ public class RssHelper {
     public static final String TAG_LINK = "link";
     public static final String TAG_DESCRIPTION = "description";
     public static final String TAG_ITEM = "item";
-    public static final String TAG_CATEGORY = "category";
-    public static final String TAG_AUTHOR = "author";
 
     public static RssFeed parseFeed(String address, Context context, ProgressDialog progressDialog) throws IOException, XmlPullParserException {
         URL url = new URL(address);
+        Log.d("url", address);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.connect();
@@ -103,14 +103,6 @@ public class RssHelper {
                         }
                     } else if (TAG_ITEM.equalsIgnoreCase(parser.getName())) {
                         itemLevel = true;
-                    } else if (TAG_CATEGORY.equalsIgnoreCase(parser.getName())) {
-                        if (itemLevel) {
-                            itemCategory = parser.nextText();
-                        }
-                    } else if (TAG_AUTHOR.equalsIgnoreCase(parser.getName())) {
-                        if (itemLevel) {
-                            itemAuthor = parser.nextText();
-                        }
                     }
                     break;
                 case XmlPullParser.END_TAG:
@@ -122,7 +114,7 @@ public class RssHelper {
                         itemList = new ArrayList<RssItem>();
                     } else if (TAG_ITEM.equalsIgnoreCase(parser.getName())) {
                         itemLevel = false;
-                        item = new RssItem(null, itemTitle, itemLink, itemDescription, itemCategory, itemAuthor, false);
+                        item = new RssItem(null, itemTitle, itemLink, itemDescription, itemCategory, itemAuthor, feed, false);
                         itemList.add(item);
                         itemTitle = null;
                         itemLink = null;

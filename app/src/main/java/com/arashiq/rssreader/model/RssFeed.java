@@ -3,14 +3,11 @@ package com.arashiq.rssreader.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by A13054 on 2015/08/06.
  */
-public class RssFeed extends RealmObject {
-    @PrimaryKey
+public class RssFeed{
     private String id;
     private String title;
     private String address;
@@ -27,9 +24,7 @@ public class RssFeed extends RealmObject {
         this.items = items != null ? items : new ArrayList<RssItem>();
     }
 
-    @Override
-    public String toString() {
-        return title;
+    public RssFeed() {
     }
 
     public String getid() {

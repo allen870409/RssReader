@@ -1,18 +1,17 @@
 package com.arashiq.rssreader.model;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by A13054 on 2015/08/06.
  */
-public class RssItem extends RealmObject {
-    @PrimaryKey
+public class RssItem{
     private String id;
     private String title;
     private String link;
     private String description;
     private String category;
+    private String detail;
+    private String imageUrl;
     private String author;
     private RssFeed feed;
 
@@ -27,6 +26,9 @@ public class RssItem extends RealmObject {
         this.author = author;
         this.feed = feed;
         this.isFavorite = isFavorite;
+    }
+
+    public RssItem() {
     }
 
     @Override
@@ -64,5 +66,21 @@ public class RssItem extends RealmObject {
 
     public RssFeed getFeed() {
         return feed;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

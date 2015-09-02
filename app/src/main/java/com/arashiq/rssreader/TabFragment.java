@@ -1,117 +1,110 @@
 package com.arashiq.rssreader;
 
-import android.content.Intent;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.xjp.androidtoolbardemo.adapter.RecyclerAdapter;
-import com.xjp.androidtoolbardemo.model.ModelBean;
+import com.arashiq.rssreader.adapter.FeedListAdapter;
+import com.arashiq.rssreader.model.RssFeed;
+import com.arashiq.rssreader.model.RssItem;
+import com.arashiq.rssreader.util.HttpHelper;
+import com.arashiq.rssreader.util.RssHelper;
 
-import java.util.ArrayList;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-/**
- * Description:
- * User: xjp
- * Date: 2015/6/15
- * Time: 15:03
- */
+import butterknife.InjectView;
 
 public class TabFragment extends Fragment {
 
-    private String content;
-    private View view;
-    private RecyclerView recyclerView;
+    private String channelUrl;
+    private Context context;
+    @InjectView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    private ProgressDialog progressDialog;
+    private RssFeed feed;
+    private List<RssItem> rssItemList;
+    private FeedListAdapter feedListAdapter;
 
-    private List<ModelBean> beanList;
-    private RecyclerAdapter adapter;
-
-    private String des[] = {"云层里的阳光", "好美的海滩", "好美的海滩", "夕阳西下的美景", "夕阳西下的美景"
-            , "夕阳西下的美景", "夕阳西下的美景", "夕阳西下的美景", "好美的海滩"};
-
-    private int resId[] = {R.drawable.img1, R.drawable.img2, R.drawable.img2, R.drawable.img3,
-            R.drawable.img4, R.drawable.img5, R.drawable.img3, R.drawable.img1};
-
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d("dddddddd", this.getArguments().toString());
+        Bundle bundle = this.getArguments();
+        context = getActivity();
+        channelUrl = bundle.getString("channelUrl");
+        this.createProgressDialog();
+        ParseFeedTask parseFeedTask = new ParseFeedTask();
+        try {
+            rssItemList = parseFeedTask.execute(channelUrl).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.item, container, false);
-        return view;
+        recyclerView = (RecyclerView)inflater.inflate(R.layout.fragment_feed_list, container, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        feedListAdapter = new FeedListAdapter(context, rssItemList);
+        recyclerView.setAdapter(feedListAdapter);
+        return recyclerView;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        content = getArguments().getString("content");
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        initData();
+    private void createProgressDialog() {
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setTitle("wait");
+        progressDialog.setMessage("getting...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(false);
+        progressDialog.setMax(100);
     }
 
-
-    private void initData() {
-        beanList = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            ModelBean bean = new ModelBean();
-            bean.setResId(resId[i]);
-            bean.setTitle(des[i]);
-            beanList.add(bean);
+    private class ParseFeedTask extends AsyncTask<String, Integer, List<RssItem>> {
+        @Override
+        protected void onPreExecute() {
+            progressDialog.show();
+            super.onPreExecute();
         }
-        adapter = new RecyclerAdapter(getActivity(), beanList);
-        recyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, Object object) {
-                startActivity(new Intent(getActivity(), TwoActivity.class));
+
+        @Override
+        protected List<RssItem> doInBackground(String... params) {
+            String feedAddress = params[0];
+            List<RssItem> itemList = new LinkedList<>();
+            try {
+                feed = RssHelper.parseFeed(feedAddress, context, progressDialog);
+                for(RssItem item : feed.getItems()){
+                    item = HttpHelper.addImageAndDetail(item);
+                    itemList.add(item);
+                }
+                progressDialog.setProgress(100);
+            } catch (IOException e) {
+                Log.e("parse", e.getMessage());
+            } catch (XmlPullParserException e) {
+                Log.e("parse", e.getMessage());
             }
-        });
-    }
-};
-
-    private int resId[] = {R.drawable.img1, R.drawable.img2, R.drawable.img2, R.drawable.img3,
-            R.drawable.img4, R.drawable.img5, R.drawable.img3, R.drawable.img1};
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.item, container, false);
-        return view;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        content = getArguments().getString("content");
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        initData();
-    }
-
-
-    private void initData() {
-        beanList = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            ModelBean bean = new ModelBean();
-            bean.setResId(resId[i]);
-            bean.setTitle(des[i]);
-            beanList.add(bean);
+            return itemList;
         }
-        adapter = new RecyclerAdapter(getActivity(), beanList);
-        recyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(new RecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, Object object) {
-                startActivity(new Intent(getActivity(), TwoActivity.class));
-            }
-        });
+
+        @Override
+        protected void onPostExecute(List<RssItem> itemList) {
+            progressDialog.dismiss();
+        }
     }
 }

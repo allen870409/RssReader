@@ -1,19 +1,20 @@
 package com.arashiq.rssreader;
 
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
-import butterknife.ButterKnife;
+import com.arashiq.rssreader.adapter.TabFragmentAdapter;
+import com.arashiq.rssreader.util.RssChannel;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.InjectView;
-import butterknife.Optional;
 
 public class MainActivity extends BaseActivity implements Toolbar.OnMenuItemClickListener {
 
@@ -37,37 +38,21 @@ public class MainActivity extends BaseActivity implements Toolbar.OnMenuItemClic
     private void initTabLayout() {
 
         List<String> tabList = new ArrayList<>();
-        tabList.add("Tab1");
-        tabList.add("Tab2");
-        tabList.add("Tab3");
-        tabList.add("Tab4");
-        tabList.add("Tab5");
-        tabList.add("Tab6");
-        tabList.add("Tab7");
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);//设置tab模式，当前为系统默认模式
-        //此处代码设置无效，不知道为啥？？？xml属性是可以的
-//        tabLayout.setTabTextColors(android.R.color.white, android.R.color.holo_red_dark);//设置TabLayout两种状态
-        tabLayout.addTab(tabLayout.newTab().setText(tabList.get(0)));//添加tab选项卡
-        tabLayout.addTab(tabLayout.newTab().setText(tabList.get(1)));
-        tabLayout.addTab(tabLayout.newTab().setText(tabList.get(2)));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab4"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab5"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab6"));
-        tabLayout.addTab(tabLayout.newTab().setText("Tab7"));
-
         List<Fragment> fragmentList = new ArrayList<>();
-        for (int i = 0; i < tabList.size(); i++) {
-            Fragment f1 = new TabFragment();
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        for(RssChannel rc : RssChannel.getAll()){
+            tabList.add(rc.getTitle());
+            Fragment f = new TabFragment();
             Bundle bundle = new Bundle();
-            bundle.putString("content", "http://blog.csdn.net/feiduclear_up \n CSDN 废墟的树");
-            f1.setArguments(bundle);
-            fragmentList.add(f1);
+            bundle.putString("channelUrl", rc.getUrl());
+            f.setArguments(bundle);
+            fragmentList.add(f);
         }
 
         TabFragmentAdapter fragmentAdapter = new TabFragmentAdapter(getSupportFragmentManager(), fragmentList, tabList);
-        viewPager.setAdapter(fragmentAdapter);//给ViewPager设置适配器
-        tabLayout.setupWithViewPager(viewPager);//将TabLayout和ViewPager关联起来。
-        tabLayout.setTabsFromPagerAdapter(fragmentAdapter);//给Tabs设置适配器
+        viewPager.setAdapter(fragmentAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabsFromPagerAdapter(fragmentAdapter);
 
     }
 
