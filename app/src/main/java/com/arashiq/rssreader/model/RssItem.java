@@ -1,10 +1,14 @@
 package com.arashiq.rssreader.model;
 
 
+import java.io.Serializable;
+
 /**
  * Created by A13054 on 2015/08/06.
  */
-public class RssItem{
+public class RssItem implements Serializable{
+
+    private static final long serialVersionUID = 7247714666080613254L;
     private String id;
     private String title;
     private String link;

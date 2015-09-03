@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/ll_todo_list"
+    android:layout_height="match_parent">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/view_toolbar" />
+    </android.support.design.widget.AppBarLayout>
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:orientation="vertical"
+        android:layout_height="fill_parent">
+        <TextView
+            android:layout_width="fill_parent"
+            android:textSize="28dp"
+            android:id="@+id/tv_item_title"
+            android:textColor="@color/style_color_primary"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:src="@drawable/avatar"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/iv_item_image"
+            android:layout_width="fill_parent"
+            android:layout_height="240dp" />
+        <TextView
+            android:layout_width="fill_parent"
+            android:textSize="20dp"
+            android:id="@+id/tv_item_detail"
+            android:layout_height="fill_parent" />
+
+    </LinearLayout>
+    </ScrollView>
+</LinearLayout>

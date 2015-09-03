@@ -1,18 +1,12 @@
 package com.arashiq.rssreader.util;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
-
 import com.arashiq.rssreader.model.RssItem;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 /**
  * Created by A13054 on 2015/09/02.
@@ -22,9 +16,9 @@ public class HttpHelper {
     public static RssItem addImageAndDetail(RssItem item) {
         Document doc = null;
         String feedUrl = item.getLink();
-        String imageUrl = null;
-        String prefix = null;
-        String suffixUrl = null;
+        String imageUrl;
+        String prefix;
+        String suffixUrl;
         String realImageUrl = null;
         try {
             doc = Jsoup.connect(item.getLink()).get();
@@ -47,31 +41,9 @@ public class HttpHelper {
             }
         }
 
-//        String detail = textBodyElement.text() + "\n" + textMoreElement.text().replaceAll("<br>", "\n");
+        String detail = textBodyElement.text() + "\n\n" + textMoreElement.text().replaceAll("<br>", "\n");
         item.setImageUrl(realImageUrl);
-//        item.setDetail(detail);
+        item.setDetail(detail);
         return item;
     }
-
-    private static Bitmap getURLImage(String url) {
-        Bitmap bmp = null;
-        if(url == null){
-            return null;
-        }
-        try {
-            URL myurl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) myurl.openConnection();
-            conn.setConnectTimeout(6000);
-            conn.setDoInput(true);
-            conn.setUseCaches(false);
-            conn.connect();
-            InputStream is = conn.getInputStream();
-            bmp = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return bmp;
-    }
-
 }

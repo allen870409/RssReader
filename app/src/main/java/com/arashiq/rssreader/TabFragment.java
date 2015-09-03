@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,13 +15,11 @@ import android.view.ViewGroup;
 import com.arashiq.rssreader.adapter.FeedListAdapter;
 import com.arashiq.rssreader.model.RssFeed;
 import com.arashiq.rssreader.model.RssItem;
-import com.arashiq.rssreader.util.HttpHelper;
 import com.arashiq.rssreader.util.RssHelper;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -40,8 +37,7 @@ public class TabFragment extends Fragment {
     private FeedListAdapter feedListAdapter;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d("dddddddd", this.getArguments().toString());
+    public void onCreate(Bundle savedInstanceState) {
         Bundle bundle = this.getArguments();
         context = getActivity();
         channelUrl = bundle.getString("channelUrl");
@@ -58,7 +54,7 @@ public class TabFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         recyclerView = (RecyclerView)inflater.inflate(R.layout.fragment_feed_list, container, false);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -86,20 +82,15 @@ public class TabFragment extends Fragment {
         @Override
         protected List<RssItem> doInBackground(String... params) {
             String feedAddress = params[0];
-            List<RssItem> itemList = new LinkedList<>();
             try {
                 feed = RssHelper.parseFeed(feedAddress, context, progressDialog);
-                for(RssItem item : feed.getItems()){
-                    item = HttpHelper.addImageAndDetail(item);
-                    itemList.add(item);
-                }
                 progressDialog.setProgress(100);
             } catch (IOException e) {
                 Log.e("parse", e.getMessage());
             } catch (XmlPullParserException e) {
                 Log.e("parse", e.getMessage());
             }
-            return itemList;
+            return feed.getItems();
         }
 
         @Override

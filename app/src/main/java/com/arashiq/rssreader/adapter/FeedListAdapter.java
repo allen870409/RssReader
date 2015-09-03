@@ -1,6 +1,8 @@
 package com.arashiq.rssreader.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,18 +12,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arashiq.rssreader.R;
-import com.arashiq.rssreader.model.RssFeed;
+import com.arashiq.rssreader.RssItemDetailActivity;
 import com.arashiq.rssreader.model.RssItem;
-import com.arashiq.rssreader.util.RssHelper;
+import com.arashiq.rssreader.util.HttpHelper;
+import com.arashiq.rssreader.util.IntentCode;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -48,12 +51,24 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         RssItem rssItem = itemList.get(position);
         holder.tvTitle.setText(rssItem.getTitle());
         holder.tvDesc.setText(rssItem.getDescription());
-        Glide.with(context)
-                .load(rssItem.getImageUrl())
-                .centerCrop()
-                .placeholder(R.drawable.avatar)
-                .crossFade()
-                .into(holder.ivItemImage);
+
+        AddItemDetailTask addItemDetailTask = new AddItemDetailTask();
+        try {
+            rssItem = addItemDetailTask.execute(rssItem).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        if(rssItem.getImageUrl() == null){
+            holder.ivItemImage.setVisibility(View.GONE);
+        }else {
+            Glide.with(context)
+                    .load(rssItem.getImageUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .placeholder(R.drawable.placeholder)
+                    .into(holder.ivItemImage);
+        }
     }
 
 
@@ -71,10 +86,42 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView tvDesc;
         @InjectView(R.id.iv_item_image)
         ImageView ivItemImage;
+
+        @OnClick(R.id.cv_rss_item)
+        public void onItemClick() {
+            editAt(getAdapterPosition());
+        }
+
+
         public RssItemViewHolder(View view) {
             super(view);
             ButterKnife.inject(this, view);
         }
+    }
+
+    private class AddItemDetailTask extends AsyncTask<RssItem, Integer, RssItem> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected RssItem doInBackground(RssItem... params) {
+            RssItem item = params[0];
+            item = HttpHelper.addImageAndDetail(item);
+            return item;
+        }
+
+        @Override
+        protected void onPostExecute(RssItem item) {
+        }
+    }
+
+    public void editAt(int position) {
+        RssItem item = itemList.get(position);
+        Intent intent = new Intent(context, RssItemDetailActivity.class);
+        intent.putExtra(IntentCode.ITEM_DETAIL, item);
+        context.startActivity(intent);
     }
 
 }
