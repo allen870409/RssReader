@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.Bind;
 import butterknife.OnClick;
 
 public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -80,11 +80,11 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
 
     public class RssItemViewHolder extends RecyclerView.ViewHolder{
-        @InjectView(R.id.tv_title)
+        @Bind(R.id.tv_title)
         TextView tvTitle;
-        @InjectView(R.id.tv_desc)
+        @Bind(R.id.tv_desc)
         TextView tvDesc;
-        @InjectView(R.id.iv_item_image)
+        @Bind(R.id.iv_item_image)
         ImageView ivItemImage;
 
         @OnClick(R.id.cv_rss_item)
@@ -95,7 +95,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public RssItemViewHolder(View view) {
             super(view);
-            ButterKnife.inject(this, view);
+            ButterKnife.bind(this, view);
         }
     }
 

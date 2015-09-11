@@ -16,6 +16,7 @@ import com.arashiq.rssreader.adapter.FeedListAdapter;
 import com.arashiq.rssreader.model.RssFeed;
 import com.arashiq.rssreader.model.RssItem;
 import com.arashiq.rssreader.util.RssHelper;
+import static com.arashiq.rssreader.util.IntentCode.CHANNEL_URL;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -23,24 +24,33 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import butterknife.InjectView;
+import butterknife.Bind;
 
 public class TabFragment extends Fragment {
 
     private String channelUrl;
     private Context context;
-    @InjectView(R.id.recyclerView)
+    @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
     private ProgressDialog progressDialog;
     private RssFeed feed;
     private List<RssItem> rssItemList;
     private FeedListAdapter feedListAdapter;
 
+    public static TabFragment newInstance(String channelUrl) {
+        TabFragment f = new TabFragment();
+        Bundle args = new Bundle();
+        args.putString(CHANNEL_URL, channelUrl);
+        f.setArguments(args);
+        return f;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Bundle bundle = this.getArguments();
+        if (getArguments() != null) {
+            channelUrl = getArguments().getString(CHANNEL_URL);
+        }
         context = getActivity();
-        channelUrl = bundle.getString("channelUrl");
         this.createProgressDialog();
         ParseFeedTask parseFeedTask = new ParseFeedTask();
         try {

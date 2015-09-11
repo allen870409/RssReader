@@ -13,15 +13,15 @@ import com.arashiq.rssreader.util.RssChannel;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.InjectView;
+import static com.arashiq.rssreader.util.IntentCode.CHANNEL_URL;
+import butterknife.Bind;
 
 public class MainActivity extends BaseActivity implements Toolbar.OnMenuItemClickListener {
 
-    @InjectView(R.id.tabs)
+    @Bind(R.id.tabs)
     TabLayout tabLayout;
 
-    @InjectView(R.id.viewPager)
+    @Bind(R.id.viewPager)
     ViewPager viewPager;
 
     protected int getContentView() {
@@ -42,10 +42,7 @@ public class MainActivity extends BaseActivity implements Toolbar.OnMenuItemClic
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         for(RssChannel rc : RssChannel.getAll()){
             tabList.add(rc.getTitle());
-            Fragment f = new TabFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("channelUrl", rc.getUrl());
-            f.setArguments(bundle);
+            Fragment f = TabFragment.newInstance(CHANNEL_URL);
             fragmentList.add(f);
         }
 

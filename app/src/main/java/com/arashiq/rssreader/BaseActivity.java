@@ -6,17 +6,14 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.Optional;
+import butterknife.Bind;
 
 public class BaseActivity extends AppCompatActivity {
 
-    @Optional
-    @InjectView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar toolbar;
 
-    @Optional
-    @InjectView(R.id.ivLogo)
+    @Bind(R.id.ivLogo)
     ImageView ivLogo;
 
     private MenuItem menuItem;
@@ -28,7 +25,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void injectViews() {
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         setupToolbar();
     }
 
